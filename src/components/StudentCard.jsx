@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./StudentCard.css";
 
 const photoParDefaut =
@@ -11,8 +12,15 @@ const photoParDefaut =
   );
 
 function StudentCard(props) {
+  // au départ, les coordonnées sont masquées
+  const [coordonneesVisibles, setCoordonneesVisibles] = useState(false);
+
   const ville = props.ville || "Non renseignée";
   const image = props.image || photoParDefaut;
+
+  function basculerCoordonnees() {
+    setCoordonneesVisibles(!coordonneesVisibles);
+  }
 
   return (
     <div className="card">
@@ -20,16 +28,41 @@ function StudentCard(props) {
       <h1 className="titre">Fiche étudiant</h1>
 
       <p><strong>Nom & Prénom :</strong> {props.nom} {props.prenom}</p>
-      <p><strong>Email :</strong> {props.email}</p>
-      <p><strong>Téléphone :</strong> {props.telephone}</p>
+
+      {coordonneesVisibles && (
+        <>
+          <p><strong>Email :</strong> {props.email}</p>
+          <p><strong>Téléphone :</strong> {props.telephone}</p>
+        </>
+      )}
+
       <p><strong>Filière :</strong> {props.filiere}</p>
       <p><strong>Année d'étude :</strong> {props.anneeEtude}</p>
       <p><strong>Groupe :</strong> {props.groupe}</p>
       <p><strong>Ville :</strong> {ville}</p>
 
-      <a href={`mailto:${props.email}`} className="btn">
-        Contacter
-      </a>
+      <div className="boutons">
+        <button className="btn" onClick={basculerCoordonnees}>
+          {coordonneesVisibles
+            ? "Masquer les coordonnées"
+            : "Afficher les coordonnées"}
+        </button>
+
+        <a href={`mailto:${props.email}`} className="btn">
+          Contacter
+        </a>
+
+        <button className="btn" onClick={() => props.onModifier(props.email)}>
+          Modifier
+        </button>
+
+        <button
+          className="btn btn-danger"
+          onClick={() => props.onSupprimer(props.email)}
+        >
+          Supprimer
+        </button>
+      </div>
     </div>
   );
 }
