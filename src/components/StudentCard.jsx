@@ -27,6 +27,7 @@ function StudentCard(props) {
       <img src={image} alt="Photo de l'étudiant" className="photo" />
       <h1 className="titre">Fiche étudiant</h1>
 
+      <p><strong>ID :</strong> {props.id}</p>
       <p><strong>Nom & Prénom :</strong> {props.nom} {props.prenom}</p>
 
       {coordonneesVisibles && (

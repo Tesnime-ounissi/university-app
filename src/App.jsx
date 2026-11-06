@@ -10,7 +10,7 @@ import Image from "./assets/meryouma.jpeg";
 
 function App() {
   const [etudiants, setEtudiants] = useState([
-    {
+    {  id: 1,
       prenom: "Tesnime",
       nom: "Ounissi",
       email: "ounissi.tesnime2@gmail.com",
@@ -21,7 +21,7 @@ function App() {
       ville: "Nabeul",
       image: studentImage,
     },
-    {
+    {  id: 2,
       prenom: "Zeineb",
       nom: "Ben Cheikh",
       email: "zeineb.bencheikh@gmail.com",
@@ -32,7 +32,7 @@ function App() {
       ville: "Mahdia",
       image: student,
     },
-    {
+    {  id: 3,
       prenom: "Meryem",
       nom: "Rhouma",
       email: "meryem.rhouma@gmail.com",
@@ -50,6 +50,7 @@ function App() {
   // Ajouter un étudiant
   function ajouterEtudiant() {
     const nouvelEtudiant = {
+      id: Math.max(0, ...etudiants.map((etudiant) => etudiant.id)) + 1,
       prenom: "Yassine",
       nom: "Ben Salem",
       email: `yassine.bensalem${Date.now()}@gmail.com`,
@@ -108,6 +109,7 @@ function App() {
         {etudiantsFiltres.map((etudiant) => (
           <StudentCard
             key={etudiant.email}
+            id={etudiant.id}
             prenom={etudiant.prenom}
             nom={etudiant.nom}
             email={etudiant.email}
