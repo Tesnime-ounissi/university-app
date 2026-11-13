@@ -3,14 +3,16 @@ import "./App.css";
 import Header from "./components/Header.jsx";
 import Navbar from "./components/Navbar.jsx";
 import StudentCard from "./components/StudentCard.jsx";
+import StudentForm from "./components/StudentForm.jsx";
 import Footer from "./components/Footer.jsx";
-import studentImage from "./assets/tessa.jpeg";
-import student from "./assets/zeinouba.jpeg";
-import Image from "./assets/meryouma.jpeg";
+import tesnimeImage from "./assets/tessa.jpeg";
+import zeinebImage from "./assets/zeinouba.jpeg";
+import meryemImage from "./assets/meryouma.jpeg";
 
 function App() {
   const [etudiants, setEtudiants] = useState([
-    {  id: 1,
+    {
+      id: 1,
       prenom: "Tesnime",
       nom: "Ounissi",
       email: "ounissi.tesnime2@gmail.com",
@@ -19,9 +21,10 @@ function App() {
       anneeEtude: "2ème année",
       groupe: "GLSI D2",
       ville: "Nabeul",
-      image: studentImage,
+      image: tesnimeImage,
     },
-    {  id: 2,
+    {
+      id: 2,
       prenom: "Zeineb",
       nom: "Ben Cheikh",
       email: "zeineb.bencheikh@gmail.com",
@@ -30,9 +33,10 @@ function App() {
       anneeEtude: "2ème année",
       groupe: "GLSI D1",
       ville: "Mahdia",
-      image: student,
+      image: zeinebImage,
     },
-    {  id: 3,
+    {
+      id: 3,
       prenom: "Meryem",
       nom: "Rhouma",
       email: "meryem.rhouma@gmail.com",
@@ -41,26 +45,20 @@ function App() {
       anneeEtude: "2ème année",
       groupe: "GLSI D2",
       ville: "Mahdia",
-      image:Image,
+      image: meryemImage,
     },
   ]);
 
   const [filtre, setFiltre] = useState("");
 
-  // Ajouter un étudiant
-  function ajouterEtudiant() {
-    const nouvelEtudiant = {
-      id: Math.max(0, ...etudiants.map((etudiant) => etudiant.id)) + 1,
-      prenom: "Yassine",
-      nom: "Ben Salem",
-      email: `yassine.bensalem${Date.now()}@gmail.com`,
-      telephone: "+216 44 444 444",
-      filiere: "Génie logiciel et système d'information",
-      anneeEtude: "2ème année",
-      groupe: "GLSI 1",
-      ville: "Sfax",
+  // Ajouter un étudiant (reçoit les données du formulaire)
+  function ajouterEtudiant(nouvelEtudiant) {
+    const etudiantAvecId = {
+      ...nouvelEtudiant,
+      id: Date.now(),
     };
-    setEtudiants([...etudiants, nouvelEtudiant]);
+
+    setEtudiants((anciensEtudiants) => [...anciensEtudiants, etudiantAvecId]);
   }
 
   // Supprimer un étudiant
@@ -92,10 +90,9 @@ function App() {
       <Header />
       <Navbar />
 
+      <StudentForm onAjouterEtudiant={ajouterEtudiant} />
+
       <div className="actions">
-        <button className="btn-ajout" onClick={ajouterEtudiant}>
-          + Ajouter un étudiant
-        </button>
         <input
           className="recherche"
           type="text"
