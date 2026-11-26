@@ -51,6 +51,9 @@ function App() {
 
   const [filtre, setFiltre] = useState("");
 
+  // Étudiant en cours de modification (null = on est en mode ajout)
+  const [etudiantAModifier, setEtudiantAModifier] = useState(null);
+
   // Ajouter un étudiant (reçoit les données du formulaire)
   function ajouterEtudiant(nouvelEtudiant) {
     const etudiantAvecId = {
@@ -64,20 +67,39 @@ function App() {
   // Supprimer un étudiant
   function supprimerEtudiant(email) {
     setEtudiants(etudiants.filter((etudiant) => etudiant.email !== email));
+
+    // si on supprime l'étudiant en cours de modification, on annule la modification
+    if (etudiantAModifier && etudiantAModifier.email === email) {
+      setEtudiantAModifier(null);
+    }
   }
 
-  // Modifier le prénom d'un étudiant
-  function modifierPrenom(email) {
-    const nouveauPrenom = prompt("Nouveau prénom :");
-    if (nouveauPrenom) {
-      setEtudiants(
-        etudiants.map((etudiant) =>
-          etudiant.email === email
-            ? { ...etudiant, prenom: nouveauPrenom }
-            : etudiant
-        )
-      );
+  // Clic sur "Modifier" dans une carte : on charge l'étudiant dans le formulaire
+  function commencerModification(valeur) {
+    const etudiant = etudiants.find(
+      (e) => e.email === valeur || e.id === valeur
+    );
+
+    if (etudiant) {
+      setEtudiantAModifier(etudiant);
+      window.scrollTo({ top: 0, behavior: "smooth" }); // remonte vers le formulaire
     }
+  }
+
+  // Enregistrer les modifications faites dans le formulaire
+  function modifierEtudiant(etudiantModifie) {
+    setEtudiants((anciensEtudiants) =>
+      anciensEtudiants.map((etudiant) =>
+        etudiant.id === etudiantModifie.id ? etudiantModifie : etudiant
+      )
+    );
+
+    setEtudiantAModifier(null); // retour en mode ajout
+  }
+
+  // Annuler la modification
+  function annulerModification() {
+    setEtudiantAModifier(null);
   }
 
   // Filtrer par filière
@@ -90,7 +112,14 @@ function App() {
       <Header />
       <Navbar />
 
-      <StudentForm onAjouterEtudiant={ajouterEtudiant} />
+      {/* key : le formulaire est recréé quand on change d'étudiant à modifier */}
+      <StudentForm
+        key={etudiantAModifier ? etudiantAModifier.id : "nouveau"}
+        onAjouterEtudiant={ajouterEtudiant}
+        etudiantAModifier={etudiantAModifier}
+        onModifierEtudiant={modifierEtudiant}
+        onAnnuler={annulerModification}
+      />
 
       <div className="actions">
         <input
@@ -105,7 +134,7 @@ function App() {
       <div className="container">
         {etudiantsFiltres.map((etudiant) => (
           <StudentCard
-            key={etudiant.email}
+            key={etudiant.id}
             id={etudiant.id}
             prenom={etudiant.prenom}
             nom={etudiant.nom}
@@ -117,7 +146,7 @@ function App() {
             ville={etudiant.ville}
             image={etudiant.image}
             onSupprimer={supprimerEtudiant}
-            onModifier={modifierPrenom}
+            onModifier={commencerModification}
           />
         ))}
 

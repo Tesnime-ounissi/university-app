@@ -1,21 +1,33 @@
 import { useState } from "react";
 import "./StudentForm.css";
 
-function StudentForm({ onAjouterEtudiant }) {
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
-  const [email, setEmail] = useState("");
-  const [telephone, setTelephone] = useState("");
-  const [filiere, setFiliere] = useState("");
-  const [anneeEtude, setAnneeEtude] = useState("");
-  const [groupe, setGroupe] = useState("");
-  const [ville, setVille] = useState("");
-  const [image, setImage] = useState("");
+const FILIERES = ["GLSI", "DSI", "RSI"];
 
+function StudentForm({
+  onAjouterEtudiant,
+  etudiantAModifier,
+  onModifierEtudiant,
+  onAnnuler,
+}) {
+  // Si on modifie un étudiant, on part de ses valeurs, sinon on part de champs vides
+  const initial = etudiantAModifier || {};
+
+  // 1. Un state par champ
+  const [nom, setNom] = useState(initial.nom || "");
+  const [prenom, setPrenom] = useState(initial.prenom || "");
+  const [email, setEmail] = useState(initial.email || "");
+  const [telephone, setTelephone] = useState(initial.telephone || "");
+  const [filiere, setFiliere] = useState(initial.filiere || "");
+  const [anneeEtude, setAnneeEtude] = useState(initial.anneeEtude || "");
+  const [groupe, setGroupe] = useState(initial.groupe || "");
+  const [ville, setVille] = useState(initial.ville || "");
+  const [image, setImage] = useState(initial.image || "");
+
+  // 2. Soumission du formulaire
   function handleSubmit(e) {
-    e.preventDefault();
+    e.preventDefault(); // empêche le rechargement de la page
 
-    const nouvelEtudiant = {
+    const donnees = {
       nom: nom,
       prenom: prenom,
       email: email,
@@ -27,25 +39,33 @@ function StudentForm({ onAjouterEtudiant }) {
       image: image,
     };
 
-    console.log("Nouvel étudiant ajouté :", nouvelEtudiant);
-    onAjouterEtudiant(nouvelEtudiant);
+    if (etudiantAModifier) {
+      // Mode modification : on garde l'identifiant de l'étudiant
+      const etudiantModifie = { ...donnees, id: etudiantAModifier.id };
+      console.log("Étudiant modifié :", etudiantModifie);
+      onModifierEtudiant(etudiantModifie);
+    } else {
+      // Mode ajout
+      console.log("Nouvel étudiant ajouté :", donnees);
+      onAjouterEtudiant(donnees);
 
-    // vider le formulaire
-    setNom("");
-    setPrenom("");
-    setEmail("");
-    setTelephone("");
-    setFiliere("");
-    setAnneeEtude("");
-    setGroupe("");
-    setVille("");
-    setImage("");
-    e.target.reset();
+      // vide le formulaire après l'ajout
+      setNom("");
+      setPrenom("");
+      setEmail("");
+      setTelephone("");
+      setFiliere("");
+      setAnneeEtude("");
+      setGroupe("");
+      setVille("");
+      setImage("");
+      e.target.reset(); // vide aussi le champ image
+    }
   }
 
   return (
-    <form className="student-form" onSubmit={handleSubmit}>
-      <h2>Ajouter un étudiant</h2>
+    <form onSubmit={handleSubmit} className="student-form">
+      <h2>{etudiantAModifier ? "Modifier un étudiant" : "Ajouter un étudiant"}</h2>
 
       <div className="form-group">
         <label htmlFor="nom">Nom :</label>
@@ -105,9 +125,15 @@ function StudentForm({ onAjouterEtudiant }) {
           required
         >
           <option value="">Choisir une filière</option>
-          <option value="GLSI">GLSI</option>
-          <option value="DSI">DSI</option>
-          <option value="RSI">RSI</option>
+          {FILIERES.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
+          {/* Permet d'afficher une filière existante qui n'est pas dans la liste */}
+          {filiere && !FILIERES.includes(filiere) && (
+            <option value={filiere}>{filiere}</option>
+          )}
         </select>
       </div>
 
@@ -117,6 +143,7 @@ function StudentForm({ onAjouterEtudiant }) {
           type="text"
           id="anneeEtude"
           name="anneeEtude"
+          placeholder="Ex : 2ème année"
           value={anneeEtude}
           onChange={(e) => setAnneeEtude(e.target.value)}
           required
@@ -143,6 +170,7 @@ function StudentForm({ onAjouterEtudiant }) {
           name="ville"
           value={ville}
           onChange={(e) => setVille(e.target.value)}
+          required
         />
       </div>
 
@@ -153,16 +181,39 @@ function StudentForm({ onAjouterEtudiant }) {
           id="image"
           accept="image/*"
           onChange={(e) => {
-            const fichier = e.target.files[0];
-
+            const fichier = e.target.files[0]; // récupère l'image choisie
             if (fichier) {
-              setImage(URL.createObjectURL(fichier));
+              setImage(URL.createObjectURL(fichier)); // URL temporaire stockée dans le state
             }
           }}
         />
+        {/* Aperçu de l'image actuelle ou choisie */}
+        {image && (
+          <img
+            src={image}
+            alt="Aperçu"
+            style={{
+              width: "80px",
+              height: "80px",
+              objectFit: "cover",
+              borderRadius: "50%",
+              margin: "10px auto 0",
+            }}
+          />
+        )}
       </div>
 
-      <button type="submit">Ajouter</button>
+      <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+        <button type="submit" className="btn-submit">
+          {etudiantAModifier ? "Enregistrer" : "Ajouter"}
+        </button>
+
+        {etudiantAModifier && (
+          <button type="button" className="btn-submit" onClick={onAnnuler}>
+            Annuler
+          </button>
+        )}
+      </div>
     </form>
   );
 }
